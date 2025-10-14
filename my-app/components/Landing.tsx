@@ -24,8 +24,8 @@ const faqs = [
 ];
 
 export default function Landing() {
-  // Only 2 circles on each side, with gray border
-  const blueCircles = [
+  // Only 2 circles on each side, with cream/brown colors
+  const backgroundCircles = [
     // Left corners
     { className: 'fixed left-[-40px] top-[-40px] w-40 h-40', color: 'bg-[#8B7355]/70', blur: 'blur-sm', delay: 0 },
     { className: 'fixed left-[-32px] bottom-[-32px] w-32 h-32', color: 'bg-[#D4A574]/70', blur: 'blur', delay: 0.2 },
@@ -38,14 +38,14 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#FFFBF0] font-sans tracking-tight relative overflow-x-hidden">
-      {/* Animated blue background circles with gray border */}
-      {blueCircles.map((circle, i) => (
+      {/* Animated cream/brown background circles */}
+      {backgroundCircles.map((circle, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: [0.9, 1.05, 0.9] }}
           transition={{ duration: 10, repeat: Infinity, delay: circle.delay, ease: 'easeInOut' }}
-          className={`${circle.className} ${circle.color} ${circle.blur} rounded-full border-2 border-gray-300 pointer-events-none z-0`}
+          className={`${circle.className} ${circle.color} ${circle.blur} rounded-full border-2 border-[#D4A574]/30 pointer-events-none z-0`}
         />
       ))}
 
@@ -76,7 +76,7 @@ export default function Landing() {
       {/* HERO */}
       <div className="relative pt-24 pb-8 px-4 mb-8">
         <div className="flex items-center justify-center">
-          <div className="w-full max-w-5xl bg-gradient-to-r from-[#D4A574] via-[#B8936F] to-[#8B7355] rounded-[50%] shadow-2xl flex items-center justify-center py-8 px-8" style={{ aspectRatio: '2/1' }}>
+          <div className="w-full max-w-5xl bg-gradient-to-r from-[#D4A574] via-[#B8936F] to-[#8B7355] shadow-2xl flex items-center justify-center py-12 px-8 rounded-[3rem]" style={{ clipPath: 'polygon(5% 20%, 15% 5%, 35% 0%, 65% 0%, 85% 5%, 95% 20%, 100% 50%, 95% 80%, 85% 95%, 65% 100%, 35% 100%, 15% 95%, 5% 80%, 0% 50%)' }}>
             <div className="text-center">
               <p className="text-sm font-black mb-8 text-white bg-black px-3 py-2 rounded-lg inline-block">Decentralized, Private, and Resilient</p>
               <h3 className="text-5xl font-bold font-black text-white italic mb-2">
