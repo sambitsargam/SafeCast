@@ -1,4 +1,4 @@
-b3'use client';
+'use client';
 
 import '@rainbow-me/rainbowkit/styles.css';
 import {

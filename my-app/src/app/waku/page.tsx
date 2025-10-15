@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Web3Provider from '../../components/Web3Provider';
+import WalletConnectButton from '../../components/WalletConnectButton';
 
 interface Message {
   id: string;
@@ -70,41 +72,21 @@ export default function WakuPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0] font-sans">
-      {/* NAVBAR */}
-      <div className="absolute top-6 left-6 z-10">
-        <Link href="/" className="focus:outline-none">
-          <div className="bg-[#8B7355] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg cursor-pointer">
-            <h1 className="text-2xl font-black text-white">🛡️ SafeCast</h1>
-          </div>
-        </Link>
-      </div>
-
-      {/* WALLET CONNECTION */}
-      <div className="absolute top-6 right-6 z-10">
-        {isWalletConnected ? (
-          <div className="flex items-center gap-3">
-            <div className="bg-[#D4A574] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-4 py-2 rounded-lg">
-              <div className="text-sm font-bold text-white">
-                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-              </div>
+    <Web3Provider>
+      <div className="min-h-screen bg-[#FFFBF0] font-sans">
+        {/* NAVBAR */}
+        <div className="absolute top-6 left-6 z-10">
+          <Link href="/" className="focus:outline-none">
+            <div className="bg-[#8B7355] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg cursor-pointer">
+              <h1 className="text-2xl font-black text-white">🛡️ SafeCast</h1>
             </div>
-            <button 
-              onClick={() => setIsWalletConnected(false)}
-              className="bg-red-500 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-4 py-2 rounded-lg text-sm font-bold text-white hover:bg-red-600 transition-colors"
-            >
-              Disconnect
-            </button>
-          </div>
-        ) : (
-          <button 
-            onClick={connectWallet}
-            className="bg-[#D4A574] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#D4A574]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
-          >
-            Connect Wallet
-          </button>
-        )}
-      </div>
+          </Link>
+        </div>
+
+        {/* WALLET CONNECTION */}
+        <div className="absolute top-6 right-6 z-10">
+          <WalletConnectButton />
+        </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         {/* Connection Status */}
