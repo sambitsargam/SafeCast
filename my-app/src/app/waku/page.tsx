@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Web3Provider from '../../components/Web3Provider';
+import Web3Provider from '../../components/Web3provider';
 import WalletConnectButton from '../../components/WalletConnectButton';
 
 interface Message {
@@ -21,8 +21,6 @@ interface Peer {
 }
 
 export default function WakuPage() {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [peers, setPeers] = useState<Peer[]>([]);
@@ -33,12 +31,6 @@ export default function WakuPage() {
   useEffect(() => {
     setNodeId(`0x${Math.random().toString(16).substr(2, 8)}...${Math.random().toString(16).substr(2, 8)}`);
   }, []);
-
-  const connectWallet = async () => {
-    // Mock wallet connection
-    setIsWalletConnected(true);
-    setWalletAddress(`0x${Math.random().toString(16).substr(2, 40)}`);
-  };
 
   const connectToWaku = async () => {
     setIsConnected(true);
@@ -56,7 +48,7 @@ export default function WakuPage() {
         id: Date.now().toString(),
         content: newMessage,
         timestamp: new Date(),
-        sender: walletAddress,
+        sender: 'Anonymous',
         isOwn: true,
       };
       setMessages(prev => [...prev, message]);
@@ -194,7 +186,7 @@ export default function WakuPage() {
             </div>
 
             {/* Message Input */}
-            {isWalletConnected && isConnected ? (
+            {isConnected ? (
               <div className="flex gap-3">
                 <textarea
                   value={newMessage}
@@ -214,8 +206,7 @@ export default function WakuPage() {
               </div>
             ) : (
               <div className="text-center text-gray-500 py-4">
-                {!isWalletConnected ? 'Connect your wallet to send messages' : 
-                 !isConnected ? 'Connect to Waku network to send messages' : ''}
+                Connect to Waku network to send messages
               </div>
             )}
           </div>
@@ -244,6 +235,7 @@ export default function WakuPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Web3Provider>
   );
 }
