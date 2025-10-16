@@ -7,10 +7,12 @@
 
 import { generateSymmetricKey } from "@waku/message-encryption";
 import { createEncoder, createDecoder } from "@waku/message-encryption/symmetric";
+import type { IRoutingInfo } from "@waku/interfaces";
 
 export interface SymmetricEncryptionConfig {
   contentTopic: string;
   symKey: Uint8Array;
+  routingInfo?: IRoutingInfo;
 }
 
 export interface SymmetricSignedConfig extends SymmetricEncryptionConfig {
@@ -34,6 +36,11 @@ export function createSymmetricEncoder(config: SymmetricEncryptionConfig) {
   return createEncoder({
     contentTopic: config.contentTopic,
     symKey: config.symKey,
+    routingInfo: config.routingInfo || { 
+      clusterId: 0, 
+      shardId: 0,
+      pubsubTopic: '/waku/2/default-waku/proto' 
+    },
   });
 }
 
@@ -47,6 +54,11 @@ export function createSignedSymmetricEncoder(config: SymmetricSignedConfig) {
     contentTopic: config.contentTopic,
     symKey: config.symKey,
     sigPrivKey: config.sigPrivKey,
+    routingInfo: config.routingInfo || { 
+      clusterId: 0, 
+      shardId: 0,
+      pubsubTopic: '/waku/2/default-waku/proto' 
+    },
   });
 }
 
@@ -54,10 +66,19 @@ export function createSignedSymmetricEncoder(config: SymmetricSignedConfig) {
  * Create a symmetric message decoder for receiving encrypted messages
  * @param contentTopic - Message content topic
  * @param symKey - Symmetric key for decrypting messages
+ * @param routingInfo - Optional routing info for pubsub
  * @returns {Object} Symmetric decoder
  */
-export function createSymmetricDecoder(contentTopic: string, symKey: Uint8Array) {
-  return createDecoder(contentTopic, symKey);
+export function createSymmetricDecoder(
+  contentTopic: string, 
+  symKey: Uint8Array,
+  routingInfo: IRoutingInfo = { 
+    clusterId: 0, 
+    shardId: 0,
+    pubsubTopic: '/waku/2/default-waku/proto' 
+  }
+) {
+  return createDecoder(contentTopic, routingInfo, symKey);
 }
 
 /**

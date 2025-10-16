@@ -1,3 +1,12 @@
+/**
+ * Waku Encryption Examples
+ * 
+ * This file contains example code snippets demonstrating how to use
+ * Waku encryption features. These are reference examples, not executable code.
+ */
+
+/* Example 1: Symmetric Encryption
+
 import { generateSymmetricKey } from "@waku/message-encryption";
 
 // Generate a random symmetric key
@@ -24,6 +33,9 @@ await subscription.subscribe([decoder], callback);
 
 // Retrieve messages from Store peers
 await node.store.queryWithOrderedCallback([decoder], callback);
+*/
+
+/* Example 2: ECIES Encryption
 
 import { generatePrivateKey, getPublicKey } from "@waku/message-encryption";
 
@@ -54,6 +66,9 @@ await subscription.subscribe([decoder], callback);
 
 // Retrieve messages from Store peers
 await node.store.queryWithOrderedCallback([decoder], callback);
+*/
+
+/* Example 3: Signed Messages
 
 import { generatePrivateKey, getPublicKey } from "@waku/message-encryption";
 import { createEncoder as createSymmetricEncoder } from "@waku/message-encryption/symmetric";
@@ -85,6 +100,9 @@ await node.lightPush.send(symmetricEncoder, { payload });
 
 await subscription.subscribe([ECIESEncoder], callback);
 await node.lightPush.send(ECIESEncoder, { payload });
+*/
+
+/* Example 4: Message Verification
 
 import { generatePrivateKey } from "@waku/message-encryption";
 import { createEncoder } from "@waku/message-encryption/symmetric";
@@ -117,6 +135,9 @@ const callback = (wakuMessage) => {
 };
 
 await subscription.subscribe([encoder], callback);
+*/
+
+/* Example 5: Key Storage
 
 import { bytesToHex, hexToBytes } from "@waku/utils/bytes";
 
@@ -131,4 +152,6 @@ const privateKeyHex = bytesToHex(privateKey);
 // Restore the keys from hexadecimal format
 const restoredSymmetricKey = hexToBytes(symmetricKeyHex);
 const restoredPrivateKey = hexToBytes(privateKeyHex);
+*/
 
+export {};

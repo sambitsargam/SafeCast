@@ -36,7 +36,7 @@ export function generateSigningPublicKey(privateKey: Uint8Array): Uint8Array {
 }
 
 /**
- * Generate a complete signing key pair
+ * Generate a signing key pair (private and public keys)
  * @returns {Object} Object containing signingPrivateKey and signingPublicKey
  */
 export function generateSigningKeyPair() {
@@ -44,8 +44,8 @@ export function generateSigningKeyPair() {
   const signingPublicKey = generateSigningPublicKey(signingPrivateKey);
   
   return {
-    signingPrivateKey,
-    signingPublicKey,
+    privateKey: signingPrivateKey,
+    publicKey: signingPublicKey,
   };
 }
 

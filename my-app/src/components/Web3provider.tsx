@@ -14,16 +14,17 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { ReactNode } from 'react';
+import type { Chain } from 'wagmi/chains';
 
 interface Web3ProviderProps {
   children: ReactNode;
   appName?: string;
   projectId?: string;
-  chains?: any[];
+  chains?: readonly [Chain, ...Chain[]];
   ssr?: boolean;
 }
 
-const defaultChains = [sepolia];
+const defaultChains = [sepolia] as const;
 
 export default function Web3Provider({ 
   children, 

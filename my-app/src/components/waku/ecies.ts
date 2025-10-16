@@ -7,10 +7,12 @@
 
 import { generatePrivateKey, getPublicKey } from "@waku/message-encryption";
 import { createEncoder, createDecoder } from "@waku/message-encryption/ecies";
+import type { IRoutingInfo } from "@waku/interfaces";
 
 export interface ECIESEncryptionConfig {
   contentTopic: string;
   publicKey: Uint8Array;
+  routingInfo?: IRoutingInfo;
 }
 
 export interface ECIESSignedConfig extends ECIESEncryptionConfig {
@@ -57,6 +59,11 @@ export function createECIESEncoder(config: ECIESEncryptionConfig) {
   return createEncoder({
     contentTopic: config.contentTopic,
     publicKey: config.publicKey,
+    routingInfo: config.routingInfo || { 
+      clusterId: 0, 
+      shardId: 0,
+      pubsubTopic: '/waku/2/default-waku/proto' 
+    },
   });
 }
 
@@ -70,6 +77,11 @@ export function createSignedECIESEncoder(config: ECIESSignedConfig) {
     contentTopic: config.contentTopic,
     publicKey: config.publicKey,
     sigPrivKey: config.sigPrivKey,
+    routingInfo: config.routingInfo || { 
+      clusterId: 0, 
+      shardId: 0,
+      pubsubTopic: '/waku/2/default-waku/proto' 
+    },
   });
 }
 
@@ -77,10 +89,19 @@ export function createSignedECIESEncoder(config: ECIESSignedConfig) {
  * Create an ECIES message decoder for receiving encrypted messages
  * @param contentTopic - Message content topic
  * @param privateKey - Private key for decrypting messages
+ * @param routingInfo - Optional routing info for pubsub
  * @returns {Object} ECIES decoder
  */
-export function createECIESDecoder(contentTopic: string, privateKey: Uint8Array) {
-  return createDecoder(contentTopic, privateKey);
+export function createECIESDecoder(
+  contentTopic: string, 
+  privateKey: Uint8Array, 
+  routingInfo: IRoutingInfo = { 
+    clusterId: 0, 
+    shardId: 0,
+    pubsubTopic: '/waku/2/default-waku/proto' 
+  }
+) {
+  return createDecoder(contentTopic, routingInfo, privateKey);
 }
 
 /**

@@ -119,7 +119,7 @@ export function restoreSigningPrivateKey(hexString: string): Uint8Array {
  * Key Storage Manager for browser localStorage
  */
 export class KeyStorageManager {
-  private storageKey: string;
+  protected storageKey: string;
 
   constructor(storageKey: string = 'safecast-waku-keys') {
     this.storageKey = storageKey;

@@ -62,9 +62,22 @@ export class SafeCastWaku {
       this.encoder = createEncoder({
         contentTopic: this.config.contentTopic,
         symKey: this.config.symKey,
+        routingInfo: {
+          clusterId: 0,
+          shardId: 0,
+          pubsubTopic: '/waku/2/default-waku/proto'
+        },
       });
 
-      this.decoder = createDecoder(this.config.contentTopic, this.config.symKey);
+      this.decoder = createDecoder(
+        this.config.contentTopic, 
+        {
+          clusterId: 0,
+          shardId: 0,
+          pubsubTopic: '/waku/2/default-waku/proto'
+        },
+        this.config.symKey
+      );
 
       // Set up message subscription
       await this.setupMessageSubscription();
@@ -223,8 +236,21 @@ export class SafeCastWaku {
       this.encoder = createEncoder({
         contentTopic: this.config.contentTopic,
         symKey: this.config.symKey,
+        routingInfo: {
+          clusterId: 0,
+          shardId: 0,
+          pubsubTopic: '/waku/2/default-waku/proto'
+        },
       });
-      this.decoder = createDecoder(this.config.contentTopic, this.config.symKey);
+      this.decoder = createDecoder(
+        this.config.contentTopic,
+        {
+          clusterId: 0,
+          shardId: 0,
+          pubsubTopic: '/waku/2/default-waku/proto'
+        },
+        this.config.symKey
+      );
     }
   }
 }
