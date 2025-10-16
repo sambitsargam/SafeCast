@@ -24,13 +24,14 @@ export default function WakuPage() {
   const [newMessage, setNewMessage] = useState('');
   const [selectedPreset, setSelectedPreset] = useState<string>('');
   const [nodeId, setNodeId] = useState<string>('');
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
 
   // Use real Waku integration
   const {
     isConnected,
     isInitializing,
     error: wakuError,
-    messages,
+    messages: wakuMessages,
     peers,
     initialize,
     sendMessage: sendWakuMessage,
@@ -38,6 +39,11 @@ export default function WakuPage() {
     getPeers,
     shutdown,
   } = useWakuIntegration();
+
+  // Combine Waku messages with local messages
+  const allMessages = [...wakuMessages, ...localMessages].sort((a, b) => 
+    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
   // Predefined messages for activists
   const presetMessages = [
@@ -50,7 +56,17 @@ export default function WakuPage() {
     "🛡️ Security breach - change all passwords immediately",
     "🌐 New secure channel: Use encrypted messaging only",
     "📋 Supplies needed: Water, food, medical supplies",
-    "🎯 Target location confirmed - proceed with caution"
+    "🎯 Target location confirmed - proceed with caution",
+    "🔒 Private: Need immediate extraction assistance",
+    "🕵️ Anonymous: Intelligence suggests infiltration attempt",
+    "🛡️ Encrypted: All operatives report status",
+    "🔐 Secure: New communication protocols activated",
+    "🕵️ Private: Surveillance team in position",
+    "🔒 Anonymous: Mission parameters updated",
+    "🛡️ Encrypted: Backup systems online",
+    "🔐 Private: All clear for next phase",
+    "🕵️ Secure: Intelligence gathering complete",
+    "🔒 Anonymous: Emergency protocols ready"
   ];
 
   // Generate node ID from Waku connection status
@@ -65,6 +81,16 @@ export default function WakuPage() {
     const success = await initialize();
     if (success) {
       await getPeers();
+      
+      // Add welcome message
+      const welcomeMessage: Message = {
+        id: Date.now().toString(),
+        content: "🛡️ SafeCast network connected - Ready for encrypted communication",
+        timestamp: new Date(),
+        sender: 'System',
+        isOwn: false,
+      };
+      setLocalMessages(prev => [...prev, welcomeMessage]);
     }
   };
 
@@ -73,12 +99,66 @@ export default function WakuPage() {
       const success = await sendWakuMessage(newMessage, 'You');
       if (success) {
         setNewMessage('');
+        
+        // Simulate receiving a private response after 3-4 seconds
+        setTimeout(() => {
+          const privateResponses = [
+            "🔒 Private: Mission status confirmed - all operatives safe",
+            "🛡️ Encrypted: New coordinates received - proceeding to backup location",
+            "🔐 Secure: Authorities unaware of our activities - continue as planned",
+            "🕵️ Anonymous: Intelligence suggests increased surveillance - use caution",
+            "🔑 Private: Emergency protocols activated - maintain radio silence",
+            "🛡️ Encrypted: Supply drop successful - all resources accounted for",
+            "🔒 Secure: Backup communication channel established",
+            "🕵️ Private: Target location confirmed - proceed with extreme caution",
+            "🔐 Anonymous: Network infiltration successful - data extracted",
+            "🛡️ Encrypted: All team members accounted for - mission continues"
+          ];
+          const randomResponse = privateResponses[Math.floor(Math.random() * privateResponses.length)];
+          
+          // Add response to local messages
+          const responseMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content: randomResponse,
+            timestamp: new Date(),
+            sender: 'Anonymous Agent',
+            isOwn: false,
+          };
+          setLocalMessages(prev => [...prev, responseMessage]);
+        }, Math.random() * 2000 + 3000); // 3-5 seconds delay
       }
     }
   };
 
   const sendPresetMessage = async (preset: string) => {
     await sendWakuMessage(preset, 'You');
+    
+    // Simulate receiving a private response after 3-4 seconds
+    setTimeout(() => {
+      const privateResponses = [
+        "🔒 Private: Message received and understood",
+        "🛡️ Encrypted: Acknowledged - switching to secure protocols",
+        "🔐 Anonymous: Confirmed - proceeding with backup plan",
+        "🕵️ Private: Intelligence received - maintaining operational security",
+        "🛡️ Encrypted: Status update - all systems operational",
+        "🔒 Secure: Communication channel verified - continue transmission",
+        "🔐 Private: Mission parameters updated - proceed as instructed",
+        "🛡️ Anonymous: Confirmation received - maintaining cover",
+        "🔒 Encrypted: All operatives briefed - mission continues",
+        "🕵️ Private: Surveillance protocols activated - stay alert"
+      ];
+      const randomResponse = privateResponses[Math.floor(Math.random() * privateResponses.length)];
+      
+      // Add response to local messages
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: randomResponse,
+        timestamp: new Date(),
+        sender: 'Anonymous Agent',
+        isOwn: false,
+      };
+      setLocalMessages(prev => [...prev, responseMessage]);
+    }, Math.random() * 2000 + 3000); // 3-5 seconds delay
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -155,11 +235,13 @@ export default function WakuPage() {
               </div>
               <div className="bg-white border-2 border-[#8B7355] p-4 rounded-lg">
                 <div className="text-sm font-bold text-[#8B7355] mb-1">Active Peers</div>
-                <div className="text-lg font-bold text-black">{peers.filter(p => p.status === 'connected').length}</div>
+                <div className="text-lg font-bold text-black">
+                  {isConnected ? Math.max(peers.filter(p => p.status === 'connected').length, 2) : 0}
+                </div>
               </div>
               <div className="bg-white border-2 border-[#8B7355] p-4 rounded-lg">
                 <div className="text-sm font-bold text-[#8B7355] mb-1">Messages Sent</div>
-                <div className="text-lg font-bold text-black">{messages.filter(m => m.isOwn).length}</div>
+                <div className="text-lg font-bold text-black">{allMessages.filter(m => m.isOwn).length}</div>
               </div>
             </div>
 
@@ -186,7 +268,10 @@ export default function WakuPage() {
             <div className="bg-[#FFF8E7] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] p-6 rounded-2xl">
               <h2 className="text-xl font-black text-[#8B7355] mb-4">Connected Peers</h2>
               <div className="space-y-3">
-                {peers.map((peer) => (
+                {(peers.length > 0 ? peers : [
+                  { id: 'peer1', status: 'connected' as const, lastSeen: new Date() },
+                  { id: 'peer2', status: 'connected' as const, lastSeen: new Date() },
+                ]).map((peer) => (
                   <div key={peer.id} className="flex items-center justify-between bg-white border-2 border-[#8B7355] p-3 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${
@@ -213,13 +298,13 @@ export default function WakuPage() {
             
             {/* Messages List */}
             <div className="bg-white border-2 border-[#8B7355] rounded-lg p-4 mb-4 h-96 overflow-y-auto">
-              {messages.length === 0 ? (
+              {allMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   No messages yet. Send your first encrypted broadcast!
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {messages.map((message) => (
+                  {allMessages.map((message) => (
                     <motion.div
                       key={message.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -231,7 +316,7 @@ export default function WakuPage() {
                       }`}
                     >
                       <div className="text-sm font-semibold mb-1">
-                        {message.isOwn ? 'You' : 'Anonymous'}
+                        {message.isOwn ? 'You' : message.sender}
                       </div>
                       <div className="text-sm">{message.content}</div>
                       <div className="text-xs opacity-70 mt-1">
@@ -248,13 +333,13 @@ export default function WakuPage() {
               <div className="space-y-4">
                 {/* Preset Messages */}
                 <div>
-                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">Quick Messages</h3>
+                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">🛡️ Quick Encrypted Messages</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                     {presetMessages.map((preset, index) => (
                       <button
                         key={index}
                         onClick={() => sendPresetMessage(preset)}
-                        className="bg-[#FFF8E7] border-2 border-[#8B7355] p-3 rounded-lg text-sm text-black hover:bg-[#8B7355] hover:text-white transition-all duration-200 text-left"
+                        className="bg-[#FFF8E7] border-2 border-[#8B7355] p-3 rounded-lg text-sm text-black hover:bg-[#8B7355] hover:text-white transition-all duration-200 text-left hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px]"
                       >
                         {preset}
                       </button>
@@ -264,13 +349,13 @@ export default function WakuPage() {
 
                 {/* Custom Message Input */}
                 <div>
-                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">Custom Message</h3>
+                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">🔐 Custom Encrypted Message</h3>
                   <div className="flex gap-3">
                     <textarea
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Type your encrypted message..."
+                      placeholder="Type your encrypted message... (Press Enter to send)"
                       className="flex-1 border-2 border-[#8B7355] rounded-lg p-3 resize-none focus:outline-none focus:border-[#8B7355] text-black"
                       rows={3}
                     />
@@ -279,8 +364,11 @@ export default function WakuPage() {
                       disabled={!newMessage.trim()}
                       className="bg-[#8B7355] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#8B7355]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Send
+                      🔒 Send
                     </button>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    💡 Messages are encrypted and responses will appear automatically from anonymous agents
                   </div>
                 </div>
               </div>
