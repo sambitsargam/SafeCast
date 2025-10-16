@@ -170,7 +170,7 @@ export class SafeCastWaku {
   getConnectionStatus(): { connected: boolean; nodeId?: string } {
     return {
       connected: this.isConnected,
-      nodeId: this.node ? bytesToHex(this.node.libp2p.peerId.toBytes()).slice(0, 16) + '...' : undefined,
+      nodeId: this.node ? this.node.libp2p.peerId.toString().slice(0, 16) + '...' : undefined,
     };
   }
 

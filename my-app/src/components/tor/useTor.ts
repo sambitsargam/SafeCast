@@ -40,7 +40,15 @@ export function useTor(config?: TorConfig): UseTorReturn {
   const [isInitializing, setIsInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [socksConfig, setSocksConfig] = useState('');
-  const [activeOnionServices, setActiveOnionServices] = useState<OnionService[]>([]);
+  const [activeOnionServices, setActiveOnionServices] = useState<OnionService[]>([
+    // Demo onion service to show users what it looks like
+    {
+      serviceId: 'i25519dboqw4fqu6xftelgiftjcok3s4niv4h5lu64r2sj3nf7vueiobha',
+      privateKey: 'demo-private-key',
+      publicKey: 'demo-public-key',
+      port: 3000,
+    }
+  ]);
   const [availableRPCs, setAvailableRPCs] = useState<string[]>([]);
 
   // Initialize Tor connection

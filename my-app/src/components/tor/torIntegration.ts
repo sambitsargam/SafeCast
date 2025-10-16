@@ -172,7 +172,8 @@ export class OnionServiceManager {
   private generateServiceId(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz234567';
     let result = '';
-    for (let i = 0; i < 16; i++) {
+    // Generate 56-character v3 onion service ID
+    for (let i = 0; i < 56; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;

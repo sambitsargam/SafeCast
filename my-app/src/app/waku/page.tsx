@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useWakuIntegration } from '../../components/waku/wakuSDK';
+import TorStatus from '../../components/tor/TorStatus';
 
 interface Message {
   id: string;
@@ -104,7 +105,31 @@ export default function WakuPage() {
         </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
-        {/* Connection Status */}
+        {/* Onion Address Display */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-[#8B7355] to-[#D4A574] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] p-6 rounded-2xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-black text-white mb-2">🛡️ SafeCast Onion Address</h2>
+                <p className="text-sm text-white/90 mb-3">Access SafeCast privately through Tor network</p>
+                <div className="bg-black/20 border border-white/30 p-3 rounded-lg font-mono text-sm text-white break-all">
+                  i25519dboqw4fqu6xftelgiftjcok3s4niv4h5lu64r2sj3nf7vueiobha.onion
+                </div>
+              </div>
+              <button
+                onClick={() => navigator.clipboard.writeText('i25519dboqw4fqu6xftelgiftjcok3s4niv4h5lu64r2sj3nf7vueiobha.onion')}
+                className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-[#8B7355] hover:bg-gray-100 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
+              >
+                📋 Copy Address
+              </button>
+            </div>
+            <div className="mt-4 p-3 bg-white/10 border border-white/20 rounded-lg">
+              <p className="text-xs text-white/90">
+                <strong>🔒 Private Access:</strong> Use this address in Tor Browser to access SafeCast without revealing your location or IP address
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="mb-8">
           <div className="bg-[#FFF8E7] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] p-6 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -152,7 +177,10 @@ export default function WakuPage() {
           </div>
         </div>
 
-        {/* Peers List */}
+        {/* Tor Network Status */}
+        <div className="mb-8">
+          <TorStatus />
+        </div>
         {isConnected && (
           <div className="mb-8">
             <div className="bg-[#FFF8E7] border-2 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] p-6 rounded-2xl">

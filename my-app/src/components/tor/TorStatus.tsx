@@ -4,10 +4,12 @@
  * Displays Tor connection status and provides controls for Tor functionality
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTorStatus } from './useTor';
 
 export default function TorStatus() {
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  
   const {
     isConnected,
     isInitializing,
@@ -26,6 +28,16 @@ export default function TorStatus() {
     const service = await createOnionService(3000);
     if (service) {
       console.log('Onion service created:', service);
+    }
+  };
+
+  const copyOnionAddress = async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedAddress(address);
+      setTimeout(() => setCopiedAddress(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy address:', err);
     }
   };
 
@@ -71,24 +83,52 @@ export default function TorStatus() {
       </div>
 
       <div className="mb-4">
-        <h3 className="text-lg font-bold text-[#8B7355] mb-2">Active Onion Services</h3>
+        <h3 className="text-lg font-bold text-[#8B7355] mb-2">🛡️ Active Onion Services</h3>
         {activeOnionServices.length === 0 ? (
           <div className="text-center text-gray-500 py-4">
-            No active onion services
+            <div className="text-sm mb-2">No active onion services</div>
+            <div className="text-xs">Create an onion service to get a private address</div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {activeOnionServices.map((service) => (
-              <div key={service.serviceId} className="bg-white border-2 border-[#8B7355] p-3 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-black">{service.serviceId}.onion</div>
-                    <div className="text-xs text-gray-600">Port: {service.port}</div>
+          <div className="space-y-3">
+            {activeOnionServices.map((service) => {
+              const fullAddress = `${service.serviceId.toLowerCase()}.onion`;
+              const isCopied = copiedAddress === fullAddress;
+              
+              return (
+                <div key={service.serviceId} className="bg-white border-2 border-[#8B7355] p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-sm font-semibold text-[#8B7355]">SafeCast Onion Service</span>
+                    </div>
+                    <button
+                      onClick={() => copyOnionAddress(fullAddress)}
+                      className={`px-3 py-1 rounded text-xs font-bold transition-all duration-200 ${
+                        isCopied 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-[#8B7355] text-white hover:bg-[#8B7355]/90'
+                      }`}
+                    >
+                      {isCopied ? '✓ Copied!' : '📋 Copy'}
+                    </button>
                   </div>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  
+                  <div className="bg-gray-50 border border-gray-300 p-3 rounded font-mono text-sm text-black break-all">
+                    {fullAddress}
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-2 text-xs text-gray-600">
+                    <span>Port: {service.port}</span>
+                    <span className="text-green-600 font-semibold">● Active</span>
+                  </div>
+                  
+                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                    <strong>🔗 Access SafeCast privately:</strong> Use this address in Tor Browser to access SafeCast without revealing your location
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
