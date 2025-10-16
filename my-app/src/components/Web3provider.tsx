@@ -7,11 +7,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
+  sepolia,
 } from 'wagmi/chains';
 import {
   QueryClientProvider,
@@ -27,7 +23,7 @@ interface Web3ProviderProps {
   ssr?: boolean;
 }
 
-const defaultChains = [mainnet, polygon, optimism, arbitrum, base];
+const defaultChains = [sepolia];
 
 export default function Web3Provider({ 
   children, 

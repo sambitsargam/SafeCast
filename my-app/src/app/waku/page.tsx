@@ -26,6 +26,21 @@ export default function WakuPage() {
   const [peers, setPeers] = useState<Peer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [nodeId, setNodeId] = useState<string>('');
+  const [selectedPreset, setSelectedPreset] = useState<string>('');
+
+  // Predefined messages for activists
+  const presetMessages = [
+    "🚨 Emergency: Authorities approaching rally point",
+    "📍 New meeting location: Central Park at 3 PM",
+    "⚠️ Network surveillance detected - switch to secure channels",
+    "✅ Mission accomplished - all safe",
+    "🔄 Backup plan activated - proceed to Plan B",
+    "📢 Important update: Event postponed to tomorrow",
+    "🛡️ Security breach - change all passwords immediately",
+    "🌐 New secure channel: Use encrypted messaging only",
+    "📋 Supplies needed: Water, food, medical supplies",
+    "🎯 Target location confirmed - proceed with caution"
+  ];
 
   // Generate a mock node ID
   useEffect(() => {
@@ -38,7 +53,6 @@ export default function WakuPage() {
     setPeers([
       { id: 'peer1', status: 'connected', lastSeen: new Date() },
       { id: 'peer2', status: 'connected', lastSeen: new Date() },
-      { id: 'peer3', status: 'connecting', lastSeen: new Date() },
     ]);
   };
 
@@ -48,12 +62,68 @@ export default function WakuPage() {
         id: Date.now().toString(),
         content: newMessage,
         timestamp: new Date(),
-        sender: 'Anonymous',
+        sender: 'You',
         isOwn: true,
       };
       setMessages(prev => [...prev, message]);
       setNewMessage('');
+      
+      // Simulate receiving a response from another peer after 2 seconds
+      setTimeout(() => {
+        const responses = [
+          "✅ Received and understood",
+          "🔄 Acknowledged - proceeding as planned",
+          "⚠️ Copy that - switching to backup plan",
+          "📍 Confirmed - will meet at new location",
+          "🛡️ Security protocols activated",
+          "📢 Message relayed to all members",
+          "✅ Status update: All safe and accounted for",
+          "🔄 Plan B initiated successfully"
+        ];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        
+        const responseMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: randomResponse,
+          timestamp: new Date(),
+          sender: 'Peer',
+          isOwn: false,
+        };
+        setMessages(prev => [...prev, responseMessage]);
+      }, 2000);
     }
+  };
+
+  const sendPresetMessage = (preset: string) => {
+    const message: Message = {
+      id: Date.now().toString(),
+      content: preset,
+      timestamp: new Date(),
+      sender: 'You',
+      isOwn: true,
+    };
+    setMessages(prev => [...prev, message]);
+    
+    // Simulate receiving a response
+    setTimeout(() => {
+      const responses = [
+        "✅ Received and understood",
+        "🔄 Acknowledged - proceeding as planned",
+        "⚠️ Copy that - switching to backup plan",
+        "📍 Confirmed - will meet at new location",
+        "🛡️ Security protocols activated"
+      ];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: randomResponse,
+        timestamp: new Date(),
+        sender: 'Peer',
+        isOwn: false,
+      };
+      setMessages(prev => [...prev, responseMessage]);
+    }, 2000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -187,22 +257,44 @@ export default function WakuPage() {
 
             {/* Message Input */}
             {isConnected ? (
-              <div className="flex gap-3">
-                <textarea
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your encrypted message..."
-                  className="flex-1 border-2 border-[#8B7355] rounded-lg p-3 resize-none focus:outline-none focus:border-[#8B7355]"
-                  rows={3}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!newMessage.trim()}
-                  className="bg-[#8B7355] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#8B7355]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Send
-                </button>
+              <div className="space-y-4">
+                {/* Preset Messages */}
+                <div>
+                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">Quick Messages</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                    {presetMessages.map((preset, index) => (
+                      <button
+                        key={index}
+                        onClick={() => sendPresetMessage(preset)}
+                        className="bg-[#FFF8E7] border-2 border-[#8B7355] p-3 rounded-lg text-sm text-black hover:bg-[#8B7355] hover:text-white transition-all duration-200 text-left"
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Message Input */}
+                <div>
+                  <h3 className="text-lg font-bold text-[#8B7355] mb-3">Custom Message</h3>
+                  <div className="flex gap-3">
+                    <textarea
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type your encrypted message..."
+                      className="flex-1 border-2 border-[#8B7355] rounded-lg p-3 resize-none focus:outline-none focus:border-[#8B7355]"
+                      rows={3}
+                    />
+                    <button
+                      onClick={sendMessage}
+                      disabled={!newMessage.trim()}
+                      className="bg-[#8B7355] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#8B7355]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="text-center text-gray-500 py-4">
