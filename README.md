@@ -48,9 +48,3 @@ Works even if traditional web access is blocked; messages stored on IPFS/Arweave
 - Docs: threat model + demo video simulating restricted network conditions
 - Forum post on Logos Forum introducing the project
 
-## ⚙️ Required Technologies
-- Tor (SOCKS5, onion services, or Brume integration)
-- Explore using Waku for messaging and Nimbus Execution Client for private RPC use cases (check out the Waku Cheatsheet)
-- Ethereum/Web3 stack (wallets, smart contracts, RPCs)
-- (Optional) Mixnets, PIR, or ZK proofs for advanced privacy
-- (Optional) Frontend frameworks (React/Next.js) for demos

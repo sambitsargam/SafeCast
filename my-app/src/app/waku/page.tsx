@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Web3Provider from '../../components/Web3provider';
-import WalletConnectButton from '../../components/WalletConnectButton';
+import { useWakuIntegration } from '../../components/waku/wakuSDK';
 
 interface Message {
   id: string;
@@ -21,12 +20,23 @@ interface Peer {
 }
 
 export default function WakuPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [peers, setPeers] = useState<Peer[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [nodeId, setNodeId] = useState<string>('');
   const [selectedPreset, setSelectedPreset] = useState<string>('');
+  const [nodeId, setNodeId] = useState<string>('');
+
+  // Use real Waku integration
+  const {
+    isConnected,
+    isInitializing,
+    error: wakuError,
+    messages,
+    peers,
+    initialize,
+    sendMessage: sendWakuMessage,
+    getConnectionStatus,
+    getPeers,
+    shutdown,
+  } = useWakuIntegration();
 
   // Predefined messages for activists
   const presetMessages = [
@@ -42,88 +52,32 @@ export default function WakuPage() {
     "🎯 Target location confirmed - proceed with caution"
   ];
 
-  // Generate a mock node ID
+  // Generate node ID from Waku connection status
   useEffect(() => {
-    setNodeId(`0x${Math.random().toString(16).substr(2, 8)}...${Math.random().toString(16).substr(2, 8)}`);
-  }, []);
+    if (isConnected) {
+      const status = getConnectionStatus();
+      setNodeId(status.nodeId || 'Unknown');
+    }
+  }, [isConnected, getConnectionStatus]);
 
   const connectToWaku = async () => {
-    setIsConnected(true);
-    // Mock peer connections
-    setPeers([
-      { id: 'peer1', status: 'connected', lastSeen: new Date() },
-      { id: 'peer2', status: 'connected', lastSeen: new Date() },
-    ]);
-  };
-
-  const sendMessage = () => {
-    if (newMessage.trim()) {
-      const message: Message = {
-        id: Date.now().toString(),
-        content: newMessage,
-        timestamp: new Date(),
-        sender: 'You',
-        isOwn: true,
-      };
-      setMessages(prev => [...prev, message]);
-      setNewMessage('');
-      
-      // Simulate receiving a response from another peer after 2 seconds
-      setTimeout(() => {
-        const responses = [
-          "✅ Received and understood",
-          "🔄 Acknowledged - proceeding as planned",
-          "⚠️ Copy that - switching to backup plan",
-          "📍 Confirmed - will meet at new location",
-          "🛡️ Security protocols activated",
-          "📢 Message relayed to all members",
-          "✅ Status update: All safe and accounted for",
-          "🔄 Plan B initiated successfully"
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        
-        const responseMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: randomResponse,
-          timestamp: new Date(),
-          sender: 'Peer',
-          isOwn: false,
-        };
-        setMessages(prev => [...prev, responseMessage]);
-      }, 2000);
+    const success = await initialize();
+    if (success) {
+      await getPeers();
     }
   };
 
-  const sendPresetMessage = (preset: string) => {
-    const message: Message = {
-      id: Date.now().toString(),
-      content: preset,
-      timestamp: new Date(),
-      sender: 'You',
-      isOwn: true,
-    };
-    setMessages(prev => [...prev, message]);
-    
-    // Simulate receiving a response
-    setTimeout(() => {
-      const responses = [
-        "✅ Received and understood",
-        "🔄 Acknowledged - proceeding as planned",
-        "⚠️ Copy that - switching to backup plan",
-        "📍 Confirmed - will meet at new location",
-        "🛡️ Security protocols activated"
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: randomResponse,
-        timestamp: new Date(),
-        sender: 'Peer',
-        isOwn: false,
-      };
-      setMessages(prev => [...prev, responseMessage]);
-    }, 2000);
+  const sendMessage = async () => {
+    if (newMessage.trim()) {
+      const success = await sendWakuMessage(newMessage, 'You');
+      if (success) {
+        setNewMessage('');
+      }
+    }
+  };
+
+  const sendPresetMessage = async (preset: string) => {
+    await sendWakuMessage(preset, 'You');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -134,8 +88,7 @@ export default function WakuPage() {
   };
 
   return (
-    <Web3Provider>
-      <div className="min-h-screen bg-[#FFFBF0] font-sans">
+    <div className="min-h-screen bg-[#FFFBF0] font-sans">
         {/* NAVBAR */}
         <div className="absolute top-6 left-6 z-10">
           <Link href="/" className="focus:outline-none">
@@ -147,7 +100,7 @@ export default function WakuPage() {
 
         {/* WALLET CONNECTION */}
         <div className="absolute top-6 right-6 z-10">
-          <WalletConnectButton />
+          {/* Wallet connection removed */}
         </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
@@ -157,12 +110,18 @@ export default function WakuPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-black text-[#8B7355]">Network Status</h2>
               <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : isInitializing ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
                 <span className="text-sm font-semibold text-black">
-                  {isConnected ? 'Connected' : 'Disconnected'}
+                  {isInitializing ? 'Connecting...' : isConnected ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
             </div>
+
+            {wakuError && (
+              <div className="bg-red-100 border-2 border-red-500 p-3 rounded-lg mb-4">
+                <p className="text-red-700 text-sm">Waku Error: {wakuError}</p>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white border-2 border-[#8B7355] p-4 rounded-lg">
@@ -179,13 +138,14 @@ export default function WakuPage() {
               </div>
             </div>
 
-            {!isConnected && (
+            {!isConnected && !isInitializing && (
               <div className="mt-4">
                 <button 
                   onClick={connectToWaku}
-                  className="bg-[#8B7355] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#8B7355]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
+                  disabled={isInitializing}
+                  className="bg-[#8B7355] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] px-6 py-3 rounded-lg text-sm font-bold text-white hover:bg-[#8B7355]/90 hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 disabled:opacity-50"
                 >
-                  Connect to Waku Network
+                  {isInitializing ? 'Connecting...' : 'Connect to Waku Network'}
                 </button>
               </div>
             )}
@@ -283,7 +243,7 @@ export default function WakuPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Type your encrypted message..."
-                      className="flex-1 border-2 border-[#8B7355] rounded-lg p-3 resize-none focus:outline-none focus:border-[#8B7355]"
+                      className="flex-1 border-2 border-[#8B7355] rounded-lg p-3 resize-none focus:outline-none focus:border-[#8B7355] text-black"
                       rows={3}
                     />
                     <button
@@ -327,7 +287,6 @@ export default function WakuPage() {
           </div>
         </div>
       </div>
-      </div>
-    </Web3Provider>
+    </div>
   );
 }
